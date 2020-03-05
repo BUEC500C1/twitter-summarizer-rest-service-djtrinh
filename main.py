@@ -1,13 +1,27 @@
 import threading
 import time
 import queue
-import twitter_api as twit
 import glob
 import os
 import os.path
 import media_creator
+import twitter_api as twit
 import datetime
-import sys
+from flask import Flask
+from flask_restful import Api
+
+app = Flask(__name__)
+api = Api(app)
+
+
+# create queue
+q1 = queue.Queue(maxsize=4)
+q2 = queue.Queue()
+
+
+@app.route("/")
+def home():
+    return "Test"
 
 
 # Thread that processes create image requests. 4 of these are run
@@ -28,19 +42,21 @@ def processor(q, mc):
 # ffmpeg subprocess thread function that calls ffmpeg when files are ready
 def ffpmeg_processor(q2, mc):
     while (True):
-        username = q2.get()
+        q2_item = q2.get()
+        username = q2_item[0]
+        date_time = q2_item[1]
         # Do not check for images if username is blank
         if username is not None:
             png_count = len(glob.glob1(r"processed_imgs/", username + r"*.png"))
             today = str(datetime.datetime.now())
 
             if png_count < 20:
-                q2.put(username)
+                q2.put(q2_item)
             else:
                 log = open("log_file.txt", 'a')
                 log.write(today + ": " + username + " video processing in progress...\n")
                 log.close()
-                mc.ffmpeg_call(username)
+                mc.ffmpeg_call(username, date_time)
         q2.task_done()
         time.sleep(.001)
 
@@ -53,32 +69,52 @@ def producer(q, q_item):
     q.join()
 
 
-# Command line interface
-def cli(q1, q2):
-    while(True):
-        id = input("Twitter id? (x to exit) ")
-        if id.lower() == 'x':
-            sys.exit();
-        elif id != '':
-            # Remove old pictures with matching Twitter ID
-            filelist = glob.glob(os.path.join(r'processed_imgs/', id + "*.png"))
-            if len(filelist) > 0:
-                for f in filelist:
-                    os.remove(f)
-            # Create processes to start generating pictures
-            q_item = [id, twit.get_user_pic(id), twit.get_users_tweets(id)]
-            t = threading.Thread(name="ProducerThread", target=producer, args=(q1, q_item))
-            q2.put(id)
-            t.start()
-        else:
-            print("Please enter a valid ID\n")
+# function that serves the user
+@app.route('/user/<username>')
+def server(username):
+    id = username
+    if id != '':
+        # Remove old pictures with matching Twitter ID
+        filelist = glob.glob(os.path.join(r'processed_imgs/', id + "*.png"))
+        if len(filelist) > 0:
+            for f in filelist:
+                os.remove(f)
+        # Create processes to start generating pictures
+        q_item = [id, twit.get_user_pic(id), twit.get_users_tweets(id)]
+        t = threading.Thread(name="ProducerThread", target=producer, args=(q1, q_item))
+        date_time = str(datetime.date.today()).replace('-', '_')
+        q2.put([id, date_time])
+        t.start()
+        return "Running video creater with final video at http://127.0.0.1:5000/video/twitter_feed_"+ username + '_' + date_time + '.mp4', 200
+    else:
+        return "Please enter a valid ID", 400
+
+
+@app.route('/video/<name>')
+def play_video(name):
+    name = name.strip()
+    if not os.path.isfile(name):
+        return "Video is still processing", 400
+
+    html = f"""
+        <center>
+            <!doctype html>
+            <html>
+                <head>
+                    <title>butterfly</title>
+                </head>
+                <body>
+                    <video width="768" controls>
+                        <source src="./../static/{name}" type="video/mp4">
+                    </video>
+                </body>
+            </html>
+        </center>
+    """
+    return html, 200
 
 
 if __name__ == '__main__':
-    # create queue
-    q1 = queue.Queue(maxsize=4)
-    q2 = queue.Queue()
-
     # create media class which has functions that create images and videos
     mc = media_creator.media_creator()
 
@@ -96,6 +132,4 @@ if __name__ == '__main__':
     t = threading.Thread(name="FFMPEG Processor", target=ffpmeg_processor, args=(q2, mc,))
     t.start()
 
-    # CLI thread
-    t = threading.Thread(name="CLI", target=cli, args=(q1, q2,))
-    t.start()
+    app.run(debug=True)

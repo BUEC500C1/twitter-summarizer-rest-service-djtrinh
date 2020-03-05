@@ -1,5 +1,5 @@
-import twitter_api as twit
 import twitter_api_stub as twit2
+import twitter_api as twit
 import os
 
 
