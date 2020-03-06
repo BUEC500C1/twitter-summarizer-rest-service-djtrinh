@@ -26,6 +26,17 @@ EC2 Server: ec2-18-189-26-79.us-east-2.compute.amazonaws.com/
 
 This application requires primarily Tweepy, Python 3, and other packages specified in the requirements.txt file.
 
+Please make sure all APIs have been installed before running the program. To run the program, run sudo python3 flaskapp.py. 
+Twitter keys must be in the root program directory named keys. The following is the format needed.
+
+```python
+[auth]
+consumer_key = ****
+consumer_secret = ****
+access_token = ****
+access_secret = ****
+```
+
 Originally, this project was a CLI interface. The project has been changed to become restful. To run it we can do the following commands:
 
 ```python
