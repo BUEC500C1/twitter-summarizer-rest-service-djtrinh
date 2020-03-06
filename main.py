@@ -85,7 +85,7 @@ def server(username):
         date_time = str(datetime.date.today()).replace('-', '_')
         q2.put([id, date_time])
         t.start()
-        return "Running video creater with final video at http://127.0.0.1:5000/video/twitter_feed_"+ username + '_' + date_time + '.mp4', 200
+        return "Running video creater with final video at ec2-18-189-26-79.us-east-2.compute.amazonaws.com/video/twitter_feed_"+ username + '_' + date_time + '.mp4', 200
     else:
         return "Please enter a valid ID", 400
 

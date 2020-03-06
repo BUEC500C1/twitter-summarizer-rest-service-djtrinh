@@ -1,4 +1,5 @@
 flask
+flask_restful
 tweepy >= 3.8.0
 requests >= 2.21.0
 configparser
