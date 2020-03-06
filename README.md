@@ -22,28 +22,35 @@ ffmpeg.exe -i test.mp4 -c:a copy -c:v copy -r 30 -s hd480 -b:v 1M output.mp4
 Each of the commands on a 3 minute test video finished in < 1 seconds. Because of this, we will be running the program with 4 threads which is overkill.
 
 ### How to Run?
+EC2 Server: ec2-18-189-26-79.us-east-2.compute.amazonaws.com/
+
 This application requires primarily Tweepy, Python 3, and other packages specified in the requirements.txt file.
 
-Please make sure all APIs have been installed before running the program. To run the program, run python main.py. 
-Twitter keys must be in the root program directory named keys. The following is the format needed.
+Originally, this project was a CLI interface. The project has been changed to become restful. To run it we can do the following commands:
 
 ```python
-[auth]
-consumer_key = ****
-consumer_secret = ****
-access_token = ****
-access_secret = ****
+
+curl http://ec2-18-189-26-79.us-east-2.compute.amazonaws.com/user/Google
+
 ```
 
-The following screenshots is the cli program in action and working:
+The user can specify which user they want to create a video of. When the server receives this command,
+20 requests are queued for the 4 threads to start creating images all running asychronously.
+The FFMPEG thread creates the final video when all images are completed.
 
-<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/cli_picture.PNG?raw=true">
+To view the final video, one would follow the link given by the previous command.
 
-<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/Example.PNG?raw=true">
+In this case, it is the following:
 
-### Results
-The bottleneck for the program is actually the image processing side. While the entire process finishes in approximately 3 secs, 4 threads really pushes the cpu and since it is a very powerful laptop CPU, results are available right away. The following snippet is a picture of the CPU usage when grabbing tweets with the Twitter API, image processig forming the final images for FFMPEG, and running FFMPEG. The program itself is using the 4 threads to process image requests from a Queue and the FFMPEG API is multithreaded from the operating system/HW.
+```python
 
-<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/cpu_usage.PNG?raw=true">
+curl ec2-18-189-26-79.us-east-2.compute.amazonaws.com/video/twitter_feed_Google_2020_03_06.mp4
 
-The application will alert the user when the video has been done processing specifying which video has completed. The user has the ability to schedule multiple Twitter videos which is still being processed by the 4 threads. However, subsequent FFMPEG calls are new processes. Progress with timestamp are logged to a text file called log_file. From there the user can see exactly when multiple video processing calls are made for each request. The next steps for this project is to have a web interface of some sort can be utilized for a much better user experience. There are also some corner cases that may need to be taken care of. However, as of currently, there are no inputs that could crash the application.
+```
+
+If a video is not ready yet, a statement saying so will be printed instead. Otherwise, the video player is shown.
+The user can also save the video if they so desire.
+
+### Conclusion
+There are more additions that can be done with with the server. Currently, it is run on an Amazon EC2 Ubuntu server. However, what we can
+do is actually implement a more user friendly interface. As a result, the user does not have to manually enter the commands. On the flip side, having the user be able to manually makes calls allows others to easily utilize the functionality for their application.
