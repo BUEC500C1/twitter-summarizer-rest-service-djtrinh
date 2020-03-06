@@ -64,9 +64,9 @@ The user can also save the video if they so desire.
 
 The following screenshots is the restful server in action and working:
 
-<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/restful_picture.PNG?raw=true">
+<img src="https://github.com/BUEC500C1/twitter-summarizer-rest-service-djtrinh/blob/master/restful_picture.PNG?raw=true">
 
-<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/Example2.PNG?raw=true">
+<img src="https://github.com/BUEC500C1/twitter-summarizer-rest-service-djtrinh/blob/master/Example2.PNG?raw=true">
 
 ### Conclusion
 There are more additions that can be done with with the server. Currently, it is run on an Amazon EC2 Ubuntu server. However, what we can
