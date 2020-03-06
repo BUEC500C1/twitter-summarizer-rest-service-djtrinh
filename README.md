@@ -22,7 +22,7 @@ ffmpeg.exe -i test.mp4 -c:a copy -c:v copy -r 30 -s hd480 -b:v 1M output.mp4
 Each of the commands on a 3 minute test video finished in < 1 seconds. Because of this, we will be running the program with 4 threads which is overkill.
 
 ### How to Run?
-EC2 Server: ec2-18-189-26-79.us-east-2.compute.amazonaws.com/
+EC2 Server: http://3.19.22.162/
 
 This application requires primarily Tweepy, Python 3, and other packages specified in the requirements.txt file.
 
@@ -41,7 +41,7 @@ Originally, this project was a CLI interface. The project has been changed to be
 
 ```python
 
-curl http://ec2-18-189-26-79.us-east-2.compute.amazonaws.com/user/Google
+curl -d 'user=Google' http://3.19.22.162/user/name -X PUT
 
 ```
 
@@ -49,13 +49,15 @@ The user can specify which user they want to create a video of. When the server 
 20 requests are queued for the 4 threads to start creating images all running asychronously.
 The FFMPEG thread creates the final video when all images are completed.
 
-To view the final video, one would follow the link given by the previous command.
+To view the final video, one would follow the link given by the previous command. Notice that the
+command is not resful here. The reason why is because multimedia playback is much better as html.
+JSON returns are not useful here.
 
 In this case, it is the following:
 
 ```python
 
-curl ec2-18-189-26-79.us-east-2.compute.amazonaws.com/video/twitter_feed_Google_2020_03_06.mp4
+curl http://3.19.22.162/video/twitter_feed_Google_2020_03_06.mp4
 
 ```
 
