@@ -7,12 +7,16 @@ import os.path
 import media_creator
 import twitter_api as twit
 import datetime
-from flask import Flask, request
+import subprocess
+from flask import Flask, request, render_template, flash, request, render_template_string
 from flask_restful import reqparse, abort, Api, Resource
+from wtforms import Form, validators, StringField
 
 
 app = Flask(__name__)
 api = Api(app)
+app.config.from_object(__name__)
+app.config['SECRET_KEY'] = 'alsdjflaksdfaslkdj2942349'
 
 # create queue
 q1 = queue.Queue(maxsize=4)
@@ -55,9 +59,24 @@ class video_restful(Resource):
             return "Please enter a valid ID", 400
 
 
-class home(Resource):
-    def get(self):
-        return {"message": "Twitter to Video Page"}
+class ReusableForm(Form):
+    name = StringField('Name:', validators=[validators.DataRequired()])
+
+
+@app.route("/", methods=['GET', 'POST'])
+def home():
+    form = ReusableForm(request.form)
+
+    if request.method == 'POST':
+        name=request.form['name']
+
+        if form.validate():
+            r = subprocess.check_output(['curl', '-d', 'user='+name, 'http://3.19.22.162/user/name', '-X', 'PUT'])
+            return render_template_string('{{text}}', text=r)
+        else:
+            flash('Error: All Fields are Required')
+
+    return render_template('index.html', form=form)
 
 
 # Multimedia playback is better to not be restful
@@ -76,7 +95,6 @@ def play_video(name):
 
 
 api.add_resource(video_restful, '/user/<todo_id>')
-api.add_resource(home, '/')
 
 
 # Thread that processes create image requests. 4 of these are run
