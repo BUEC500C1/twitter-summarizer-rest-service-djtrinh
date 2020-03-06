@@ -10,6 +10,7 @@ import datetime
 from flask import Flask
 from flask_restful import Api
 
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -72,43 +73,35 @@ def producer(q, q_item):
 # function that serves the user
 @app.route('/user/<username>')
 def server(username):
-    id = username
-    if id != '':
+    if username != '':
         # Remove old pictures with matching Twitter ID
-        filelist = glob.glob(os.path.join(r'processed_imgs/', id + "*.png"))
+        filelist = glob.glob(os.path.join(r'processed_imgs/', username + "*.png"))
         if len(filelist) > 0:
             for f in filelist:
                 os.remove(f)
         # Create processes to start generating pictures
-        q_item = [id, twit.get_user_pic(id), twit.get_users_tweets(id)]
+        q_item = [username, twit.get_user_pic(username), twit.get_users_tweets(username)]
         t = threading.Thread(name="ProducerThread", target=producer, args=(q1, q_item))
         date_time = str(datetime.date.today()).replace('-', '_')
-        q2.put([id, date_time])
+        q2.put([username, date_time])
         t.start()
         return "Running video creater with final video at ec2-18-189-26-79.us-east-2.compute.amazonaws.com/video/twitter_feed_"+ username + '_' + date_time + '.mp4', 200
     else:
         return "Please enter a valid ID", 400
 
 
+# Function to play videos
 @app.route('/video/<name>')
 def play_video(name):
     name = name.strip()
-    if not os.path.isfile(name):
+    print(name)
+    if not os.path.isfile('./static/'+name):
         return "Video is still processing", 400
-
     html = f"""
         <center>
-            <!doctype html>
-            <html>
-                <head>
-                    <title>butterfly</title>
-                </head>
-                <body>
-                    <video width="768" controls>
-                        <source src="./../static/{name}" type="video/mp4">
-                    </video>
-                </body>
-            </html>
+            <video width="768" controls>
+                <source src="/static/{name}" type="video/mp4">
+            </video>
         </center>
     """
     return html, 200
@@ -132,4 +125,5 @@ if __name__ == '__main__':
     t = threading.Thread(name="FFMPEG Processor", target=ffpmeg_processor, args=(q2, mc,))
     t.start()
 
-    app.run(debug=True)
+    # Flask
+    app.run(host="0.0.0.0", port=80)
