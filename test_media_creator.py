@@ -1,4 +1,5 @@
 import media_creator as mc
+import datetime
 from PIL import Image
 
 
@@ -24,7 +25,8 @@ def test_fetch():
 
 def test_ffmpeg_call(capsys):
     m = mc.media_creator()
-    m.ffmpeg_call("test")
+    date_time = str(datetime.date.today()).replace('-', '_')
+    m.ffmpeg_call("test", date_time)
     captured = capsys.readouterr()
     assert captured.err.find("no file")
 
