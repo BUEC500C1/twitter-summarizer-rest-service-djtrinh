@@ -62,6 +62,12 @@ curl ec2-18-189-26-79.us-east-2.compute.amazonaws.com/video/twitter_feed_Google_
 If a video is not ready yet, a statement saying so will be printed instead. Otherwise, the video player is shown.
 The user can also save the video if they so desire.
 
+The following screenshots is the restful server in action and working:
+
+<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/restful_picture.PNG?raw=true">
+
+<img src="https://github.com/BUEC500C1/video-djtrinh/blob/master/Example2.PNG?raw=true">
+
 ### Conclusion
 There are more additions that can be done with with the server. Currently, it is run on an Amazon EC2 Ubuntu server. However, what we can
 do is actually implement a more user friendly interface. As a result, the user does not have to manually enter the commands. On the flip side, having the user be able to manually makes calls allows others to easily utilize the functionality for their application.
