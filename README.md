@@ -66,6 +66,8 @@ The following screenshots is the restful server in action and working:
 
 <img src="https://github.com/BUEC500C1/twitter-summarizer-rest-service-djtrinh/blob/master/restful_picture.PNG?raw=true">
 
+-------------------------------------------------------------------------------------------------------------------------
+
 <img src="https://github.com/BUEC500C1/twitter-summarizer-rest-service-djtrinh/blob/master/Example2.PNG?raw=true">
 
 ### Conclusion
