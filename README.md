@@ -26,7 +26,7 @@ EC2 Server: http://3.19.22.162/
 
 This application requires primarily Tweepy, Python 3, and other packages specified in the requirements.txt file.
 
-Please make sure all APIs have been installed before running the program. To run the program, run sudo python3 flaskapp.py. 
+Please make sure all APIs have been installed before running the program. To run the program, run sudo python3 main.py. 
 Twitter keys must be in the root program directory named keys. The following is the format needed.
 
 ```python
