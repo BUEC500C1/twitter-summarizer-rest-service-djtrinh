@@ -82,16 +82,28 @@ def home():
 # Multimedia playback is better to not be restful
 @app.route("/video/<name>")
 def play_video(name):
-    if not os.path.isfile('./static/' + name):
+    name = name.strip()
+    if not os.path.isfile('/home/ubuntu/flaskapp/static/' + name):
         return "Video is still processing", 400
-    html = f"""
-        <center>
-            <video width="768" controls>
-                <source src="/static/{name}" type="video/mp4">
-            </video>
-        </center>
-    """
+    else:
+        if os.path.getsize('/home/ubuntu/flaskapp/static/' + name) >= 100000:
+            html = f"""
+            <!doctype html>
+                <html>
+                    <body>
+                        <center>
+                            <video width="768" controls>
+                            <source src="/static/{name}" type="video/mp4">
+                            </video>
+                        </center>
+                    </body>
+                 </html>
+           """
+        else:
+            return "Video is still processing", 400
+
     return html, 200
+
 
 
 api.add_resource(video_restful, '/user/<todo_id>')
