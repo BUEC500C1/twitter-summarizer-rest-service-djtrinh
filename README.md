@@ -64,6 +64,14 @@ curl http://3.19.22.162/video/twitter_feed_Google_2020_03_06.mp4
 If a video is not ready yet, a statement saying so will be printed instead. Otherwise, the video player is shown.
 The user can also save the video if they so desire.
 
+You can also manually check the status of a video file.
+
+```python
+
+curl -d 'filename=twitter_feed_Google_2020_03_06.mp4' http://3.19.22.162/user/status -X PUT
+
+```
+
 The following screenshots is the restful server in action and working:
 
 <img src="https://github.com/BUEC500C1/twitter-summarizer-rest-service-djtrinh/blob/master/Example.PNG?raw=true">
