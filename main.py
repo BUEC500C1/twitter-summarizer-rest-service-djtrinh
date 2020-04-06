@@ -41,22 +41,32 @@ class video_restful(Resource):
         return TODOS
 
     def put(self, todo_id):
-        username = request.form['user']
-        if username != '':
-            # Remove old pictures with matching Twitter ID
-            filelist = glob.glob(os.path.join(r'processed_imgs/', username + "*.png"))
-            if len(filelist) > 0:
-                for f in filelist:
-                    os.remove(f)
-            # Create processes to start generating pictures
-            q_item = [username, twit.get_user_pic(username), twit.get_users_tweets(username)]
-            t = threading.Thread(name="ProducerThread", target=producer, args=(q1, q_item))
-            date_time = str(datetime.date.today()).replace('-', '_')
-            q2.put([username, date_time])
-            t.start()
-            return "Running video creater with final video at 3.19.22.162/video/twitter_feed_" + username + '_' + date_time + '.mp4', 200
-        else:
-            return "Please enter a valid ID", 400
+        if todo_id == "name":
+            username = request.form['user']
+            if username != '':
+                # Remove old pictures with matching Twitter ID
+                filelist = glob.glob(os.path.join(r'processed_imgs/', username + "*.png"))
+                if len(filelist) > 0:
+                    for f in filelist:
+                        os.remove(f)
+                # Create processes to start generating pictures
+                q_item = [username, twit.get_user_pic(username), twit.get_users_tweets(username)]
+                t = threading.Thread(name="ProducerThread", target=producer, args=(q1, q_item))
+                date_time = str(datetime.date.today()).replace('-', '_')
+                q2.put([username, date_time])
+                t.start()
+                return "Running video creater with final video at 3.19.22.162/video/twitter_feed_" + username + '_' + date_time + '.mp4', 200
+            else:
+                return "Please enter a valid ID", 400
+        elif todo_id == 'status':
+            filename = request.form['filename']
+            if not os.path.isfile('/home/ubuntu/flaskapp/static/' + filename):
+                return "Video is still processing", 400
+            else:
+                if os.path.getsize('/home/ubuntu/flaskapp/static/' + filename) >= 100000:
+                    return "Video is done", 400
+                else:
+                    return "Video is still processing", 400
 
 
 class ReusableForm(Form):
@@ -71,7 +81,7 @@ def home():
         name=request.form['name']
 
         if form.validate():
-            r = subprocess.check_output(['curl', '-d', 'user='+name, 'http://3.19.22.162/user/name', '-X', 'PUT'])
+            r = subprocess.check_output(['curl', '-d', 'user='+name, 'http://127.0.0.1/user/name', '-X', 'PUT'])
             return render_template_string('{{text}}', text=r)
         else:
             flash('Error: All Fields are Required')
